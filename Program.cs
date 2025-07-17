@@ -246,25 +246,100 @@ public class Program
         
     }
 
+
+    public struct stContact
+    {
+        public int ID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public string Email {  get; set; }
+
+        public string Phone { get; set; }
+
+        public string Address { get; set; }
+        public int CountryID { get; set; }   
+    
+    
+    }
+
+    static bool FindContactByID(int ContactID, ref stContact contactInfo)
+    {
+        bool isFound = false;
+        string query = "SELECT * from Contacts WHERE ContactID = @ContactID";
+
+        using (SqlConnection connect = new SqlConnection(connectionString))
+        using (SqlCommand CMD = new SqlCommand(query, connect))
+        {
+            try
+            {
+                connect.Open();
+                SqlDataReader reader = CMD.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    isFound = true;
+                    contactInfo.ID = (int)reader["ContactID"];
+                    contactInfo.FirstName = (string)reader["FirstName"];
+                    contactInfo.LastName = (string)reader["LastName"];
+                    // training handel null values
+                    contactInfo.Email = reader["Email"] == DBNull.Value ? null : (string)reader["Email"];
+                    contactInfo.Phone = (string)reader["phone"];
+                    contactInfo.Address = (string)reader["Adress"];
+                    contactInfo.CountryID = (int)reader["CountryID"];
+                }
+                else
+                {
+                    isFound = false;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error : " + ex.Message);
+            }
+        }
+        return isFound;
+    }
+
+
+
+
     public static void Main()
     {
-        // PRINT ALL 
+        //PRINT ALL
         //Console.WriteLine("__________ALL________");
         //PrintAllContacts();
         //Console.WriteLine("__________By First Name & Country________");
-        //// PRINT BY PARAMETER 
+        // PRINT BY PARAMETER 
         //PrintAllContactByFirstNameAndCountryID("Jane", 1);
         //Console.WriteLine("________Start With 'j%'__________");
-        ////'LIKE' StatWith search 
+        //'LIKE' StatWith search 
 
         //SearchContactStartWith("J");
         //Console.WriteLine("_________End with '%e'_________");
 
-        //SearchContactEndtWith("e");
+        // SearchContactEndtWith("e");
 
-        Console.WriteLine("_________Search only one value _________");
-        GetFirstName(2);
+        //Console.WriteLine("_________Search only one value _________");
+        //GetFirstName(2);
+
+
+        stContact Contact_Info = new stContact();
+
+        if (FindContactByID(1,ref Contact_Info))
+        {
+            Console.WriteLine("Founded");
+        }
+        else
+        {
+            Console.WriteLine("Not Founded");
+        }
+
+
         Console.ReadKey();
+
     }
 
 }
