@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Remoting.Messaging;
@@ -285,7 +286,7 @@ public class Program
                     // training handel null values
                     contactInfo.Email = reader["Email"] == DBNull.Value ? null : (string)reader["Email"];
                     contactInfo.Phone = (string)reader["phone"];
-                    contactInfo.Address = (string)reader["Adress"];
+                    contactInfo.Address = (string)reader["Address"];
                     contactInfo.CountryID = (int)reader["CountryID"];
                 }
                 else
@@ -304,7 +305,84 @@ public class Program
     }
 
 
+    static void AddNewContact(stContact newContact)
+    {
+        string query = @"INSERT INTO Contacts (FirstName, LastName, 
+                 Email, Phone, Address, CountryID) VALUES (@FN, @LN, @Email, @Phone,
+                    @Address, @CountryID)";
+                 
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        using (SqlCommand CMD = new SqlCommand(query, connection))
+        {
+            CMD.Parameters.AddWithValue("@FN", newContact.FirstName);
+           CMD.Parameters.AddWithValue("@LN",newContact.LastName);
+            CMD.Parameters.AddWithValue("@Email", newContact.Email);
+            CMD.Parameters.AddWithValue("@Phone",newContact.Phone);
+            CMD.Parameters.AddWithValue("@Address",newContact.Address);
+            CMD.Parameters.AddWithValue("@CountryID", newContact.CountryID);
 
+            try
+            {
+                connection.Open();
+                int rowsAffected = CMD.ExecuteNonQuery();
+
+                if (rowsAffected>0)
+                {
+                    Console.WriteLine("record inserted successfully.");
+                }
+                else { Console.WriteLine("record insrtion failed"); }
+
+            
+            
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("error : "+ ex.Message);
+            }
+
+
+
+        }
+
+        
+    }
+
+    static void  AddRowAndReturnID(stContact newContact)
+    {
+
+        string query = "INSERT INTO Contacts (FirstName, LastName, Email, Phone, Address, CountryID) "+ 
+            " VALUES (@FN,@LN,@EM,@PHN,@ADRS,@CNTR);" +
+            " SELECT SCOPE_IDENTITY();";
+
+        using (SqlConnection cnx = new SqlConnection(connectionString))
+        using (SqlCommand CMD = new SqlCommand(query, cnx))
+        {
+            CMD.Parameters.AddWithValue("@FN",newContact.FirstName);
+            CMD.Parameters.AddWithValue("@LN", newContact.LastName);
+            CMD.Parameters.AddWithValue("@EM", newContact.Email);
+            CMD.Parameters.AddWithValue("@PHN", newContact.Phone);
+            CMD.Parameters.AddWithValue("@ADRS", newContact.Address);
+            CMD.Parameters.AddWithValue("@CNTR", newContact.CountryID);
+
+            try
+            {
+                cnx.Open();
+                object retrivedID = CMD.ExecuteScalar();
+
+                if (retrivedID != null && int.TryParse(retrivedID.ToString(), out int insertedID))
+                {
+                    Console.WriteLine($"Newly inserted Id = {insertedID}");
+                } else
+                { Console.WriteLine("Failed"); }
+
+
+
+            }
+            catch (Exception ex)
+            { Console.WriteLine("Erreor: " + ex.Message); }
+        }
+       
+    }
 
     public static void Main()
     {
@@ -326,17 +404,32 @@ public class Program
         //GetFirstName(2);
 
 
-        stContact Contact_Info = new stContact();
+        //stContact Contact_Info = new stContact();
 
-        if (FindContactByID(1,ref Contact_Info))
-        {
-            Console.WriteLine("Founded");
-        }
-        else
-        {
-            Console.WriteLine("Not Founded");
-        }
+        //if (FindContactByID(1,ref Contact_Info))
+        //{
+        //    Console.WriteLine("Founded");
+        //}
+        //else
+        //{
+        //    Console.WriteLine("Not Founded");
+        //}
 
+
+        stContact Contact = new stContact
+        {
+            FirstName = "Naila",
+            LastName = "Rouabah",
+            Email = "Exmpl@ldz",
+            Phone = "055906",
+            Address = "344 street",
+            CountryID = 3
+
+        };
+
+       // AddNewContact(Contact);
+
+        AddRowAndReturnID(Contact);
 
         Console.ReadKey();
 
