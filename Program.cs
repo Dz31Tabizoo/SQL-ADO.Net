@@ -473,7 +473,7 @@ WHERE ContactID = @id;";
         }
 
     }
-    /* This is the righit way to do it on C# 8.0  
+    /*This is the righit way to do it on C# 8.0  
      * 
      * public static async Task DeleteContactAsync(int id)
     {
@@ -487,6 +487,41 @@ WHERE ContactID = @id;";
         }
     }
     */
+
+    static void HandelInStatment(string Parameters)
+    {
+        string query = @"DELETE FROM Contacts
+                            WHERE ContactID IN " + $" ({Parameters});";
+
+        using (SqlConnection cnx = new SqlConnection(connectionString))
+        using (SqlCommand cmd = new SqlCommand(query, cnx))
+        {
+            try
+            {
+                cnx.Open();
+
+                int rowAffected = cmd.ExecuteNonQuery();
+
+                if(rowAffected > 0)
+                {
+                    Console.WriteLine("Query Done successefuly");
+                }
+                else
+                {
+                    Console.WriteLine("FAILED -_-");
+                }
+
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error : " + ex.Message);
+            }
+
+
+        }
+
+
+    }
 
     public static void Main()
     {
@@ -537,7 +572,9 @@ WHERE ContactID = @id;";
 
        //  UpdateContact(10,Contact);
 
-        DeleteContact(10);
+        // DeleteContact(10);
+
+        HandelInStatment("1,2,3");
 
         Console.ReadKey();
 
