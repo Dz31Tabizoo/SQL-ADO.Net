@@ -7,6 +7,7 @@ using System.Net;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Remoting.Messaging;
 using System.Security.Policy;
+using System.Threading.Tasks;
 
 public class Program
 {
@@ -472,6 +473,20 @@ WHERE ContactID = @id;";
         }
 
     }
+    /* This is the righit way to do it on C# 8.0  
+     * 
+     * public static async Task DeleteContactAsync(int id)
+    {
+        const string query = "DELETE FROM Contacts WHERE ContactID = @id;";
+        await using (var connection = new SqlConnection(connectionString))
+        await using (var command = new SqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@id", id);
+            await connection.OpenAsync();
+            await command.ExecuteNonQueryAsync();
+        }
+    }
+    */
 
     public static void Main()
     {
