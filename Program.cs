@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Policy;
 
 public class Program
 {
@@ -347,7 +349,7 @@ public class Program
         
     }
 
-    static void  AddRowAndReturnID(stContact newContact)
+    static void ANumberddRowAndReturnIDauto(stContact newContact)
     {
 
         string query = "INSERT INTO Contacts (FirstName, LastName, Email, Phone, Address, CountryID) "+ 
@@ -384,6 +386,64 @@ public class Program
        
     }
 
+    static void UpdateContact(int id, stContact Contact)
+    {
+        string query = "UPDATE Contacts " +
+            "SET FirstName = @FirstName, " +
+                 "LastName = @LastName, " +
+                 "Email = @Email, " +
+                 "Phone = @Phone, " +
+                 "Address = @Address, " +
+                 "CountryID = @CountryID " +
+                 "WHERE ContactID = @ContactID";
+
+        using (SqlConnection cnx = new SqlConnection(connectionString)) 
+        using (SqlCommand cmd = new SqlCommand(query, cnx))
+        {
+            cmd.Parameters.AddWithValue("@ContactID", id);
+            cmd.Parameters.AddWithValue("@FirstName", Contact.FirstName);
+            cmd.Parameters.AddWithValue("@LastName", Contact.LastName);
+            cmd.Parameters.AddWithValue("@Email", Contact.Email);
+            cmd.Parameters.AddWithValue("@Phone", Contact.Phone);
+            cmd.Parameters.AddWithValue("@Address", Contact.Address);
+            cmd.Parameters.AddWithValue("@CountryID", Contact.CountryID);
+
+            try 
+            {
+              cnx.Open();
+
+                int rowAffected = cmd.ExecuteNonQuery();
+
+                if (rowAffected > 0)
+                {
+                    Console.WriteLine("record updated");
+                }
+
+                else
+                {
+                    Console.WriteLine("update failed");
+
+                }
+
+            
+            
+            
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
+
+        }
+
+
+
+
+
+
+    }
     public static void Main()
     {
         //PRINT ALL
@@ -418,18 +478,20 @@ public class Program
 
         stContact Contact = new stContact
         {
-            FirstName = "Naila",
-            LastName = "Rouabah",
-            Email = "Exmpl@ldz",
-            Phone = "055906",
-            Address = "344 street",
+            FirstName = "Nailamod",
+            LastName = "Rouabahmod",
+            Email = "Exmpl@ldzmod",
+            Phone = "055906mod",
+            Address = "344 streetmod",
             CountryID = 3
 
         };
 
        // AddNewContact(Contact);
 
-        AddRowAndReturnID(Contact);
+      //  ANumberddRowAndReturnIDauto(Contact);
+
+        UpdateContact(1006,Contact);
 
         Console.ReadKey();
 
