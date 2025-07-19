@@ -423,15 +423,12 @@ public class Program
                 {
                     Console.WriteLine("update failed");
 
-                }
-
-            
-            
+                }                
             
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("ERROR : "+ ex.Message);
             }
 
 
@@ -444,6 +441,38 @@ public class Program
 
 
     }
+
+    static void DeleteContact(int id)
+    {
+        string query = @"DELETE FROM Contacts
+WHERE ContactID = @id;";
+
+        using (SqlConnection conx = new SqlConnection(connectionString))
+        using (SqlCommand cmd = new SqlCommand(query, conx))
+        {
+            cmd.Parameters.AddWithValue("@id", id);
+            try
+            {
+                conx.Open();
+                int rowAffected = cmd.ExecuteNonQuery();
+                if (rowAffected > 0 )
+                {
+                    Console.WriteLine($"contact {id} Deleted successfuly");
+                }
+                else { Console.WriteLine("delete Failed"); }
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine ("Error : " + ex.Message);
+            }
+
+
+        }
+
+    }
+
     public static void Main()
     {
         //PRINT ALL
@@ -491,7 +520,9 @@ public class Program
 
       //  ANumberddRowAndReturnIDauto(Contact);
 
-        UpdateContact(1006,Contact);
+       //  UpdateContact(10,Contact);
+
+        DeleteContact(10);
 
         Console.ReadKey();
 
